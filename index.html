@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Job Application Sender</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --ai-purple: #8b5cf6;
+            --bg: #ecf0f1;
+            --surface: #ffffff;
+            --text: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border: #bdc3c7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '✨';
+            position: absolute;
+            font-size: 4rem;
+            opacity: 0.1;
+            top: 1rem;
+            right: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header .ai-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .setup-warning {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid var(--ai-purple);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 2.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .setup-warning h3 {
+            color: var(--ai-purple);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .setup-warning ol {
+            color: var(--primary);
+            margin-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .setup-warning li {
+            margin-bottom: 0.5rem;
+        }
+
+        .setup-warning code {
+            background: #f8f9fa;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .setup-warning a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .setup-warning a:hover {
+            text-decoration: underline;
+        }
+
+        .form-container {
+            padding: 3rem 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-out backwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--surface);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .recipients-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .recipient-card {
+            background: #f8f9fa;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .recipient-card:hover {
+            border-color: var(--ai-purple);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+        }
+
+        .recipient-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .recipient-number {
+            background: var(--ai-purple);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .recipient-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-group label {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .field-group input {
+            padding: 0.75rem;
+        }
+
+        .btn-remove {
+            padding: 0.5rem 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-remove:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-add:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .file-input-label:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            color: #667eea;
+        }
+
+        .file-name {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: #e8f5e9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--success);
+            font-weight: 600;
+            display: none;
+        }
+
+        .file-name.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-send {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #667eea 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-send::before {
+            content: '✨';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-send:hover::before {
+            left: 1rem;
+        }
+
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-send:active {
+            transform: translateY(0);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+            white-space: pre-line;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .progress-container {
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .progress-container.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #667eea);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .ai-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #667eea 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .ai-sparkle {
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .setup-warning {
+                margin: 1.5rem 1rem;
+            }
+
+            .recipient-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .recipient-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 AI-Powered Job Application Sender</h1>
+            <div class="ai-badge">🤖 Powered by Google Gemini AI</div>
+            <p>Personalized emails for each company - automatically generated!</p>
+        </div>
+
+        <div class="setup-warning">
+            <h3>🚀 Quick Setup (5 minutes)</h3>
+            <p style="margin-bottom: 1rem; color: var(--primary); font-weight: 600;">Two API keys needed:</p>
+            <ol>
+                <li><strong>Gmail App Password:</strong> <a href="https://myaccount.google.com/apppasswords" target="_blank">Google App Passwords</a> → Generate for "Mail"</li>
+                <li><strong>Gemini API Key:</strong> <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a> → "Get API Key" (FREE!)</li>
+            </ol>
+            <p style="margin-top: 1rem; color: var(--primary); font-weight: 600;">✨ AI will write a unique, personalized email for each company!</p>
+        </div>
+
+        <div class="form-container">
+            <div class="form-group">
+                <label for="senderEmail">Your Gmail Address</label>
+                <input type="email" id="senderEmail" value="pratham98861@gmail.com" placeholder="your.email@gmail.com">
+            </div>
+
+            <div class="form-group">
+                <label for="senderPassword">Gmail App Password</label>
+                <div class="password-field">
+                    <input type="password" id="senderPassword" placeholder="16-character app password">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                </div>
+                <p class="help-text">Get from <a href="https://myaccount.google.com/apppasswords" target="_blank">Google App Passwords</a></p>
+            </div>
+
+            <div class="form-group">
+                <label for="geminiApiKey">
+                    Gemini API Key
+                    <span class="ai-indicator"><span class="ai-sparkle">✨</span> AI Magic</span>
+                </label>
+                <div class="password-field">
+                    <input type="password" id="geminiApiKey" placeholder="Your Gemini API key">
+                    <button type="button" class="toggle-password" onclick="toggleGeminiPassword()">👁️</button>
+                </div>
+                <p class="help-text">Get FREE from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a> - AI writes emails!</p>
+            </div>
+
+            <div class="form-group">
+                <label>Recipients & Companies <span class="ai-indicator"><span class="ai-sparkle">✨</span> AI personalizes for each</span></label>
+                <div class="recipients-container" id="recipientsContainer">
+                    <div class="recipient-card">
+                        <div class="recipient-card-header">
+                            <div class="recipient-number">1</div>
+                            <button type="button" class="btn-remove" onclick="removeRecipient(this)">Remove</button>
+                        </div>
+                        <div class="recipient-fields">
+                            <div class="field-group">
+                                <label>Company Name</label>
+                                <input type="text" class="company-name" placeholder="e.g., Google" required>
+                            </div>
+                            <div class="field-group">
+                                <label>Recruiter Email</label>
+                                <input type="email" class="recipient-email" placeholder="recruiter@company.com" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-add" onclick="addRecipient()">+ Add Another Company</button>
+                <p class="help-text">AI generates unique email for each company!</p>
+            </div>
+
+            <div class="form-group">
+                <label>Attach Your CV/Resume</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".pdf,.doc,.docx" onchange="handleFileSelect(event)">
+                    <label for="fileInput" class="file-input-label">
+                        <span>📎</span>
+                        <span>Choose File (PDF, DOC, DOCX)</span>
+                    </label>
+                </div>
+                <div class="file-name" id="fileName"></div>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Generating AI emails...</div>
+            </div>
+
+            <button type="button" class="btn-send" onclick="sendEmails()">Generate AI Emails & Send to All</button>
+
+            <div class="status-message" id="statusMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        let recipientCount = 1;
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('senderPassword');
+            const toggleBtn = passwordInput.nextElementSibling;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        function toggleGeminiPassword() {
+            const passwordInput = document.getElementById('geminiApiKey');
+            const toggleBtn = passwordInput.nextElementSibling;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        function addRecipient() {
+            recipientCount++;
+            const container = document.getElementById('recipientsContainer');
+            const card = document.createElement('div');
+            card.className = 'recipient-card';
+            card.innerHTML = `
+                <div class="recipient-card-header">
+                    <div class="recipient-number">${recipientCount}</div>
+                    <button type="button" class="btn-remove" onclick="removeRecipient(this)">Remove</button>
+                </div>
+                <div class="recipient-fields">
+                    <div class="field-group">
+                        <label>Company Name</label>
+                        <input type="text" class="company-name" placeholder="e.g., Google" required>
+                    </div>
+                    <div class="field-group">
+                        <label>Recruiter Email</label>
+                        <input type="email" class="recipient-email" placeholder="recruiter@company.com" required>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+            card.style.animation = 'slideDown 0.3s ease-out';
+            updateRecipientNumbers();
+        }
+
+        function removeRecipient(button) {
+            const container = document.getElementById('recipientsContainer');
+            if (container.children.length > 1) {
+                button.closest('.recipient-card').remove();
+                updateRecipientNumbers();
+            } else {
+                showStatus('You must have at least one recipient', 'error');
+            }
+        }
+
+        function updateRecipientNumbers() {
+            const cards = document.querySelectorAll('.recipient-card');
+            cards.forEach((card, index) => {
+                card.querySelector('.recipient-number').textContent = index + 1;
+            });
+            recipientCount = cards.length;
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const fileNameDiv = document.getElementById('fileName');
+            
+            if (file) {
+                fileNameDiv.textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                fileNameDiv.classList.add('show');
+            } else {
+                fileNameDiv.classList.remove('show');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message ${type} show`;
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        async function sendEmails() {
+            const senderEmail = document.getElementById('senderEmail').value.trim();
+            const senderPassword = document.getElementById('senderPassword').value.trim();
+            const geminiApiKey = document.getElementById('geminiApiKey').value.trim();
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            // Get all recipients
+            const recipientCards = document.querySelectorAll('.recipient-card');
+            const recipients = Array.from(recipientCards).map(card => ({
+                company: card.querySelector('.company-name').value.trim(),
+                email: card.querySelector('.recipient-email').value.trim()
+            })).filter(r => r.company && r.email);
+
+            // Validation
+            if (!validateEmail(senderEmail)) {
+                showStatus('Please enter a valid sender email', 'error');
+                return;
+            }
+
+            if (!senderPassword) {
+                showStatus('Please enter your Gmail App Password', 'error');
+                return;
+            }
+
+            if (!geminiApiKey) {
+                showStatus('Please enter your Gemini API Key', 'error');
+                return;
+            }
+
+            if (recipients.length === 0) {
+                showStatus('Please add at least one recipient', 'error');
+                return;
+            }
+
+            for (let recipient of recipients) {
+                if (!validateEmail(recipient.email)) {
+                    showStatus(`Invalid email: ${recipient.email}`, 'error');
+                    return;
+                }
+                if (!recipient.company) {
+                    showStatus('Please fill in all company names', 'error');
+                    return;
+                }
+            }
+
+            // Show progress
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const sendButton = document.querySelector('.btn-send');
+
+            progressContainer.classList.add('show');
+            sendButton.disabled = true;
+
+            let successCount = 0;
+            let failCount = 0;
+            let errorMessages = [];
+
+            try {
+                for (let i = 0; i < recipients.length; i++) {
+                    const recipient = recipients[i];
+                    const progress = ((i + 1) / recipients.length) * 100;
+                    
+                    progressFill.style.width = `${progress}%`;
+                    progressText.textContent = `✨ AI writing for ${recipient.company}... (${i + 1}/${recipients.length})`;
+
+                    try {
+                        const formData = new FormData();
+                        formData.append('sender_email', senderEmail);
+                        formData.append('sender_password', senderPassword);
+                        formData.append('recipient_email', recipient.email);
+                        formData.append('company_name', recipient.company);
+                        formData.append('gemini_api_key', geminiApiKey);
+                        
+                        if (file) {
+                            formData.append('attachment', file);
+                        }
+
+                        const response = await fetch('http://localhost:5000/send-email', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            successCount++;
+                            console.log(`✓ ${recipient.company}:`, result.email_body);
+                        } else {
+                            failCount++;
+                            errorMessages.push(`${recipient.company}: ${result.error}`);
+                        }
+                        
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                    } catch (error) {
+                        failCount++;
+                        errorMessages.push(`${recipient.company}: ${error.message}`);
+                    }
+                }
+
+                if (successCount === recipients.length) {
+                    showStatus(`✨ Success! ${successCount} AI emails sent to:\n${recipients.map(r => `• ${r.company}`).join('\n')}`, 'success');
+                } else if (successCount > 0) {
+                    showStatus(`⚠️ Sent ${successCount}, ${failCount} failed:\n${errorMessages.join('\n')}`, 'info');
+                } else {
+                    showStatus(`❌ Failed:\n${errorMessages.join('\n')}`, 'error');
+                }
+
+                progressContainer.classList.remove('show');
+                progressFill.style.width = '0%';
+
+            } catch (error) {
+                showStatus('Error: Flask server not running! Run: python app.py', 'error');
+            } finally {
+                sendButton.disabled = false;
+            }
+        }
+
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:5000/');
+                if (response.ok) {
+                    showStatus('✓ Server ready!', 'success');
+                }
+            } catch (error) {
+                showStatus('⚠️ Run: pip install -r requirements.txt && python app.py', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
