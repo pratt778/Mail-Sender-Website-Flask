@@ -5,10 +5,14 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from flask.cli import load_dotenv
 import google.generativeai as genai
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+
+load_dotenv()
+
 
 app = Flask(__name__)
 CORS(app)
@@ -20,6 +24,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max file size
 
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+PASSWORD = os.getenv('PASSWORD')
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -116,15 +122,15 @@ def generate_email_endpoint():
     try:
         data = request.json
         company_name = data.get("company_name")
-        gemini_api_key = data.get("gemini_api_key")
+        # gemini_api_key = data.get("gemini_api_key")
 
-        if not company_name or not gemini_api_key:
+        if not company_name:
             return (
                 jsonify({"success": False, "error": "Missing company name or API key"}),
                 400,
             )
 
-        success, email_body = generate_personalized_email(company_name, gemini_api_key)
+        success, email_body = generate_personalized_email(company_name)
 
         if success:
             return jsonify({"success": True, "email_body": email_body})
@@ -140,25 +146,25 @@ def send_email_endpoint():
     try:
         data = request.form
         sender_email = data.get("sender_email")
-        sender_password = data.get("sender_password")
+        # sender_password = data.get("sender_password")
         recipient_email = data.get("recipient_email")
         company_name = data.get("company_name")
-        gemini_api_key = data.get("gemini_api_key")
+        # gemini_api_key = data.get("gemini_api_key")
 
         # Validate required fields
         if not all(
             [
                 sender_email,
-                sender_password,
+                # sender_password,
                 recipient_email,
                 company_name,
-                gemini_api_key,
+                # gemini_api_key,
             ]
         ):
             return jsonify({"success": False, "error": "Missing required fields"}), 400
 
         # Generate personalized email body
-        success, email_body = generate_personalized_email(company_name, gemini_api_key)
+        success, email_body = generate_personalized_email(company_name, GEMINI_API_KEY)
         if not success:
             return (
                 jsonify(
@@ -185,7 +191,7 @@ def send_email_endpoint():
         # Send email
         success, message = send_email(
             sender_email,
-            sender_password,
+            PASSWORD,
             recipient_email,
             subject,
             email_body,

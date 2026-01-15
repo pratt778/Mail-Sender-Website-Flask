@@ -561,27 +561,8 @@
                 <input type="email" id="senderEmail" value="pratham98861@gmail.com" placeholder="your.email@gmail.com">
             </div>
 
-            <div class="form-group">
-                <label for="senderPassword">Gmail App Password</label>
-                <div class="password-field">
-                    <input type="password" id="senderPassword" placeholder="16-character app password">
-                    <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
-                </div>
-                <p class="help-text">Get from <a href="https://myaccount.google.com/apppasswords" target="_blank">Google App Passwords</a></p>
-            </div>
-
-            <div class="form-group">
-                <label for="geminiApiKey">
-                    Gemini API Key
-                    <span class="ai-indicator"><span class="ai-sparkle">✨</span> AI Magic</span>
-                </label>
-                <div class="password-field">
-                    <input type="password" id="geminiApiKey" placeholder="Your Gemini API key">
-                    <button type="button" class="toggle-password" onclick="toggleGeminiPassword()">👁️</button>
-                </div>
-                <p class="help-text">Get FREE from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a> - AI writes emails!</p>
-            </div>
-
+            
+            
             <div class="form-group">
                 <label>Recipients & Companies <span class="ai-indicator"><span class="ai-sparkle">✨</span> AI personalizes for each</span></label>
                 <div class="recipients-container" id="recipientsContainer">
@@ -729,8 +710,8 @@
 
         async function sendEmails() {
             const senderEmail = document.getElementById('senderEmail').value.trim();
-            const senderPassword = document.getElementById('senderPassword').value.trim();
-            const geminiApiKey = document.getElementById('geminiApiKey').value.trim();
+            // const senderPassword = document.getElementById('senderPassword').value.trim();
+            // const geminiApiKey = document.getElementById('geminiApiKey').value.trim();
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
 
@@ -747,15 +728,15 @@
                 return;
             }
 
-            if (!senderPassword) {
-                showStatus('Please enter your Gmail App Password', 'error');
-                return;
-            }
+            // if (!senderPassword) {
+            //     showStatus('Please enter your Gmail App Password', 'error');
+            //     return;
+            // }
 
-            if (!geminiApiKey) {
-                showStatus('Please enter your Gemini API Key', 'error');
-                return;
-            }
+            // if (!geminiApiKey) {
+            //     showStatus('Please enter your Gemini API Key', 'error');
+            //     return;
+            // }
 
             if (recipients.length === 0) {
                 showStatus('Please add at least one recipient', 'error');
@@ -797,10 +778,10 @@
                     try {
                         const formData = new FormData();
                         formData.append('sender_email', senderEmail);
-                        formData.append('sender_password', senderPassword);
+                        // formData.append('sender_password', senderPassword);
                         formData.append('recipient_email', recipient.email);
                         formData.append('company_name', recipient.company);
-                        formData.append('gemini_api_key', geminiApiKey);
+                        // formData.append('gemini_api_key', geminiApiKey);
                         
                         if (file) {
                             formData.append('attachment', file);
