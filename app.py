@@ -41,26 +41,26 @@ def generate_personalized_email(company_name, gemini_api_key):
             print(m.name)
         model = genai.GenerativeModel("models/gemini-2.5-flash")
 
-        prompt = f"""Write a professional, concise job application email for a Flutter Developer position at {company_name}.
+        prompt = f"""Write a job application email for a Flutter Developer position at {company_name}.
 
 Requirements:
-- Keep it SHORT (150-200 words maximum)
-- Professional but friendly tone
-- Mention that I have 1 year of Flutter development experience
-- Mention that the company's requirements align with my Flutter skills and experience
-- Express genuine interest in {company_name} specifically
-- Mention CV is attached
-- End with a call to action
-- DO NOT use overly formal or generic language
-- Make it feel personal and genuine
-- on the most bottom part write the name Pratham Sharma
-- dont give any [] for me to fill in or write eg.:
-- dont make it too long, very short and consise, short and simple 
-- this is a reference on how short it should be : 
-I am applying for the Flutter Developer position at {company_name}. I have 1 year of experience in Flutter development, and my skills align well with your requirements.
-I have been following your company's work and am impressed by your teams work. I would love the opportunity to contribute to your team.
-My resume is attached below. I look forward to hearing from you.
-Write ONLY the email body, no subject line."""
+- Maximum 180 words
+- Conversational and genuine tone
+- Mention 1 year Flutter experience
+- One sentence about why {company_name} specifically interests you
+- Mention attached CV
+- Simple closing
+- Sign off with "Pratham Sharma"
+
+Structure:
+1. Opening: State the position you're applying for
+2. Experience: Brief mention of 1 year Flutter experience and skill alignment
+3. Interest: Few genuine sentences about the company
+4. CV mention and simple call to action
+5. Sign off
+
+Write ONLY the email body. No subject line. No brackets or placeholders.
+Keep sentences short and direct. Avoid flowery language like "express strong interest" or "thrilled to discuss."""
 
         response = model.generate_content(prompt)
         return True, response.text.strip()
